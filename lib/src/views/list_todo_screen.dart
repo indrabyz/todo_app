@@ -19,37 +19,44 @@ class _ListTodoScreenState extends State<ListTodoScreen> {
         backgroundColor: Colors.lightGreen,
         title: Text('Todo App'),
         centerTitle: true,
-        
       ),
       body: FutureBuilder(
-        future: _todoDBHelper.getAllTodo(),
-        builder: (context, AsyncSnapshot<List<Todo>> snapshot) {
-          if (snapshot.data.length != 0) {
-            return ListView.builder(
-            itemCount: snapshot.data.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
-                child: Card(
-                  child: ListTile(
-                    leading: Icon(MdiIcons.calendarOutline),
-                    title: Text(snapshot.data[index].task),
-                  ),
-                ),
+          future: _todoDBHelper.getAllTodo(),
+          builder: (context, AsyncSnapshot<List<Todo>> snapshot) {
+            if (snapshot.data.length != 0) {
+              return ListView.builder(
+                itemCount: snapshot.data.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context, 
+                          MaterialPageRoute(
+                            builder: (context) => CreateTodoScreen(todo: snapshot.data[index],)
+                          )
+                        );
+                      },
+                      child: Card(
+                        child: ListTile(
+                          leading: Icon(MdiIcons.calendarOutline),
+                          title: Text(snapshot.data[index].task),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               );
-            },
-          );
-          } else {
-            return Column(
-              children: <Widget>[
-                Image.asset("assets/images/task.png"),
-                Text("Ayo isi task anda !"),
-              ],
-            );
-          }
-          
-        }
-      ),
+            } else {
+              return Column(
+                children: <Widget>[
+                  Image.asset("assets/images/task.png"),
+                  Text("Ayo isi task anda !"),
+                ],
+              );
+            }
+          }),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blueAccent,
         onPressed: () {

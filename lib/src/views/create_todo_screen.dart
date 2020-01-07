@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:todo_app/src/database/todo_db_helper.dart';
 import 'package:todo_app/src/models/todo.dart';
 
 class CreateTodoScreen extends StatefulWidget {
+  final Todo todo;
+  CreateTodoScreen({Key key, this.todo}) : super(key: key);
+
   @override
   _CreateTodoScreenState createState() => _CreateTodoScreenState();
 }
@@ -12,12 +16,32 @@ class _CreateTodoScreenState extends State<CreateTodoScreen> {
   final TextEditingController descriptionController = TextEditingController();
 
   @override
+  void initState() {
+    if (widget.todo != null) {
+      taskController.text = widget.todo.task;
+      descriptionController.text = widget.todo.description;
+    }
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.lightGreen,
-        title: Text('Add Todo'),
+        title: Text('Todo'),
         iconTheme: IconThemeData(color: Colors.blueAccent),
+        actions: <Widget>[
+          InkWell(
+            onTap: () {
+              deleteTodo();
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(MdiIcons.checkBold),
+            ),
+          )
+        ],
       ),
       body: Column(
         children: <Widget>[
@@ -52,8 +76,7 @@ class _CreateTodoScreenState extends State<CreateTodoScreen> {
           ),
         ),
       ),
-      floatingActionButtonLocation: 
-        FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
@@ -65,8 +88,23 @@ class _CreateTodoScreenState extends State<CreateTodoScreen> {
     );
 
     var result;
-    result = await db.addTodo(todo);
+    if (widget.todo != null) {
+      todo.id = widget.todo.id;
+      result = await db.updateTodo(todo, widget.todo.id);
+    } else {
+      result = await db.addTodo(todo);
+    }
 
+    if (result != 0) {
+      Navigator.pop(context);
+    }
+  }
+
+  Future deleteTodo() async {
+    var db = TodoDBHelper();
+    var result = 
+      await db.deleteTodo(widget.todo.id);
+    
     if (result != 0) {
       Navigator.pop(context);
     }

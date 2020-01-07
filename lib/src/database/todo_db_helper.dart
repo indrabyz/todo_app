@@ -37,8 +37,7 @@ class TodoDBHelper {
     await db.execute("CREATE TABLE Todo ("
         "id INTEGER PRIMARY KEY AUTOINCREMENT,"
         "task VARCHAR(191) NOT NULL,"
-        "description VARCHAR(191) NOT NULL)"
-      );
+        "description VARCHAR(191) NOT NULL)");
   }
 
   Future<List<Todo>> getAllTodo() async {
@@ -58,6 +57,29 @@ class TodoDBHelper {
     var dbClient = await db;
 
     int response = await dbClient.insert('Todo', todo.toMap());
+    return response;
+  }
+
+  Future<int> updateTodo(Todo todo, int id) async {
+    var dbClient = await db;
+
+    int response = await dbClient.update(
+      'Todo',
+      todo.toMap(),
+      where: "id = ?",
+      whereArgs: [id],
+    );
+    return response;
+  }
+
+  Future<int> deleteTodo(int id) async {
+    var dbClient = await db;
+
+    int response = await dbClient.delete(
+      'Todo',
+      where: "id = ?",
+      whereArgs: [id],
+    );
     return response;
   }
 }
